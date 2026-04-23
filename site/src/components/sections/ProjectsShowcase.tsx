@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 
-const FRAME_COUNT = 99;
+const FRAME_COUNT = 169;
 
 const projects = [
   {
@@ -61,10 +60,12 @@ export function ProjectsShowcase() {
   const tickingRef = useRef(false);
   const prevVisibleIdsRef = useRef("");
   const introOpacityRef = useRef(1);
+  const lastFrameRef = useRef(-1);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const cardRefsMap = useRef<Map<string, HTMLDivElement>>(new Map());
 
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
-  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
   const [ctaVisible, setCtaVisible] = useState(false);
 
   // Preload all frames
@@ -87,12 +88,15 @@ export function ProjectsShowcase() {
     framesRef.current = imgs;
   }, []);
 
-  // Draw frame with cover-fit
+  // Draw frame — skip if same frame
   const drawFrame = useCallback((index: number) => {
+    if (index === lastFrameRef.current) return;
+    lastFrameRef.current = index;
+
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
+    const ctx = ctxRef.current;
     const img = framesRef.current[index];
-    if (!canvas || !ctx || !img) return;
+    if (!canvas || !ctx || !img || !img.complete) return;
 
     const cw = canvas.width;
     const ch = canvas.height;
@@ -123,6 +127,8 @@ export function ProjectsShowcase() {
 
     const drawX = (cw - drawW) / 2;
     const drawY = (ch - drawH) / 2;
+
+    ctx.clearRect(0, 0, cw, ch);
     ctx.drawImage(img, drawX, drawY, drawW, drawH);
   }, []);
 
@@ -135,6 +141,8 @@ export function ProjectsShowcase() {
     canvas.height = window.innerHeight * dpr;
     canvas.style.width = window.innerWidth + "px";
     canvas.style.height = window.innerHeight + "px";
+    ctxRef.current = canvas.getContext("2d", { alpha: false });
+    lastFrameRef.current = -1;
   }, []);
 
   // Scroll handler
@@ -176,33 +184,37 @@ export function ProjectsShowcase() {
           Math.max(0, -rect.top / scrollableHeight)
         );
 
-        // 1. Draw frame
+        // 1. Draw frame (skips redundant draws)
         const frameIndex = Math.min(
           FRAME_COUNT - 1,
           Math.floor(progress * FRAME_COUNT)
         );
         drawFrame(frameIndex);
 
-        // 2. Intro text fade (first 6%)
+        // 2. Intro text fade (first 6%) — direct DOM
         if (introOverlayRef.current) {
           const newIntroOpacity = Math.max(0, 1 - progress / 0.06);
-          if (Math.abs(newIntroOpacity - introOpacityRef.current) > 0.01) {
+          if (Math.abs(newIntroOpacity - introOpacityRef.current) > 0.005) {
             introOpacityRef.current = newIntroOpacity;
             introOverlayRef.current.style.opacity = String(newIntroOpacity);
+            introOverlayRef.current.style.transform = `translateY(${progress * 40}px) scale(${1 - progress * 0.1})`;
           }
         }
 
-        // 3. Project card visibility
-        const newVisible = new Set<string>();
+        // 3. Project card visibility — direct DOM for smooth transitions
         for (const proj of projects) {
-          if (progress >= proj.show && progress <= proj.hide) {
-            newVisible.add(proj.id);
+          const el = cardRefsMap.current.get(proj.id);
+          if (!el) continue;
+          const isVisible = progress >= proj.show && progress <= proj.hide;
+          if (isVisible) {
+            el.style.opacity = "1";
+            el.style.transform = "translateY(-50%) scale(1)";
+            el.style.pointerEvents = "auto";
+          } else {
+            el.style.opacity = "0";
+            el.style.transform = "translateY(-40%) scale(0.95)";
+            el.style.pointerEvents = "none";
           }
-        }
-        const newIds = [...newVisible].sort().join(",");
-        if (newIds !== prevVisibleIdsRef.current) {
-          prevVisibleIdsRef.current = newIds;
-          setVisibleCards(new Set(newVisible));
         }
 
         // 4. CTA overlay at 82%
@@ -210,6 +222,15 @@ export function ProjectsShowcase() {
         setCtaVisible((prev) =>
           prev === shouldShowCta ? prev : shouldShowCta
         );
+
+        // Clear ticking and prev visible for backward compat
+        const newVisible = new Set<string>();
+        for (const proj of projects) {
+          if (progress >= proj.show && progress <= proj.hide) {
+            newVisible.add(proj.id);
+          }
+        }
+        prevVisibleIdsRef.current = [...newVisible].sort().join(",");
 
         tickingRef.current = false;
       });
@@ -231,13 +252,16 @@ export function ProjectsShowcase() {
       style={{ height: "500vh" }}
       className="scroll-animation relative bg-zinc-950"
     >
-      {/* Loading bar — only shows when this section is in view but not loaded */}
+      {/* Loading bar */}
       {!loaded && (
         <div className="sticky top-0 h-screen flex flex-col items-center justify-center bg-zinc-950 z-30">
           <div className="w-64 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
             <div
-              className="h-full loading-bar rounded-full transition-all duration-100"
-              style={{ width: `${loadProgress * 100}%` }}
+              className="h-full loading-bar rounded-full"
+              style={{
+                width: `${loadProgress * 100}%`,
+                transition: "width 0.15s linear",
+              }}
             />
           </div>
           <p className="mt-4 text-xs tracking-wider text-zinc-500 uppercase font-mono">
@@ -247,21 +271,15 @@ export function ProjectsShowcase() {
       )}
 
       {loaded && (
-        <div
-          className="sticky top-0 h-screen"
-          style={{ willChange: "transform", transform: "translateZ(0)" }}
-        >
+        <div className="sticky top-0 h-screen gpu-layer">
           {/* Canvas */}
-          <canvas
-            ref={canvasRef}
-            className="h-full w-full"
-            style={{ willChange: "contents", transform: "translateZ(0)" }}
-          />
+          <canvas ref={canvasRef} className="h-full w-full gpu-canvas" />
 
-          {/* Intro overlay — fades in first 6% */}
+          {/* Intro overlay */}
           <div
             ref={introOverlayRef}
             className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-6"
+            style={{ willChange: "opacity, transform" }}
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/50 px-3 py-1.5 text-[10px] font-medium tracking-wider text-zinc-400 uppercase backdrop-blur-md mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
@@ -279,24 +297,30 @@ export function ProjectsShowcase() {
             </p>
           </div>
 
-          {/* Project cards — dark glassmorphism */}
+          {/* Project cards — direct DOM controlled */}
           {projects.map((proj) => {
-            const isVisible = visibleCards.has(proj.id);
             const idx = projects.indexOf(proj);
             const isRight = idx % 2 === 1;
 
             return (
               <div
                 key={proj.id}
-                className={`absolute top-1/2 transition-all duration-400 max-w-sm max-md:max-w-[280px] ${
+                ref={(el) => {
+                  if (el) cardRefsMap.current.set(proj.id, el);
+                }}
+                className={`absolute top-1/2 max-w-sm max-md:max-w-[280px] ${
                   isRight
                     ? "right-6 md:right-12 lg:right-20"
                     : "left-6 md:left-12 lg:left-20"
-                } ${
-                  isVisible
-                    ? "-translate-y-1/2 opacity-100"
-                    : "-translate-y-[40%] opacity-0 pointer-events-none"
                 }`}
+                style={{
+                  opacity: 0,
+                  transform: "translateY(-40%) scale(0.95)",
+                  pointerEvents: "none",
+                  transition:
+                    "opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+                  willChange: "transform, opacity",
+                }}
               >
                 <div className="bg-black/50 backdrop-blur-2xl border border-white/10 rounded-[20px] p-7 max-md:p-4">
                   <span className="inline-block px-2.5 py-1 rounded-full bg-white/10 text-[10px] font-medium tracking-wider text-zinc-400 uppercase mb-3">
@@ -313,13 +337,16 @@ export function ProjectsShowcase() {
             );
           })}
 
-          {/* CTA overlay — appears at 82% */}
+          {/* CTA overlay */}
           <div
-            className={`absolute inset-0 flex items-center justify-center transition-all duration-500 ${
-              ctaVisible
-                ? "opacity-100"
-                : "opacity-0 pointer-events-none"
+            className={`absolute inset-0 flex items-center justify-center ${
+              ctaVisible ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
+            style={{
+              transition:
+                "opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+              willChange: "opacity",
+            }}
           >
             <div className="bg-black/70 backdrop-blur-xl rounded-[20px] border border-white/10 p-10 max-w-md text-center max-md:mx-6 max-md:p-6">
               <h3 className="text-2xl md:text-3xl font-semibold tracking-tighter text-white mb-3">

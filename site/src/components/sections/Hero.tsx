@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const FRAME_COUNT = 120;
+const FRAME_COUNT = 169;
 
 const annotations = [
   {
@@ -42,6 +42,8 @@ export function Hero() {
   const framesRef = useRef<HTMLImageElement[]>([]);
   const tickingRef = useRef(false);
   const prevVisibleIdsRef = useRef("");
+  const lastFrameRef = useRef(-1);
+  const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
 
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
@@ -67,12 +69,15 @@ export function Hero() {
     framesRef.current = imgs;
   }, []);
 
-  // Draw a frame with cover-fit
+  // Draw a frame with cover-fit — only if frame actually changed
   const drawFrame = useCallback((index: number) => {
+    if (index === lastFrameRef.current) return; // skip redundant draws
+    lastFrameRef.current = index;
+
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
+    const ctx = ctxRef.current;
     const img = framesRef.current[index];
-    if (!canvas || !ctx || !img) return;
+    if (!canvas || !ctx || !img || !img.complete) return;
 
     const cw = canvas.width;
     const ch = canvas.height;
@@ -82,7 +87,6 @@ export function Hero() {
     let drawW: number, drawH: number;
 
     if (window.innerWidth > 768) {
-      // Desktop: standard cover-fit
       if (canvasRatio > imgRatio) {
         drawW = cw;
         drawH = cw / imgRatio;
@@ -91,7 +95,6 @@ export function Hero() {
         drawW = ch * imgRatio;
       }
     } else {
-      // Mobile: cover-fit + 1.3x zoom
       if (canvasRatio > imgRatio) {
         drawW = cw;
         drawH = cw / imgRatio;
@@ -105,6 +108,8 @@ export function Hero() {
 
     const drawX = (cw - drawW) / 2;
     const drawY = (ch - drawH) / 2;
+
+    ctx.clearRect(0, 0, cw, ch);
     ctx.drawImage(img, drawX, drawY, drawW, drawH);
   }, []);
 
@@ -117,6 +122,8 @@ export function Hero() {
     canvas.height = window.innerHeight * dpr;
     canvas.style.width = window.innerWidth + "px";
     canvas.style.height = window.innerHeight + "px";
+    ctxRef.current = canvas.getContext("2d", { alpha: false });
+    lastFrameRef.current = -1; // force redraw after resize
   }, []);
 
   // Scroll handler + resize
@@ -128,7 +135,6 @@ export function Hero() {
 
     const handleResize = () => {
       resizeCanvas();
-      // Redraw current frame after resize
       const section = sectionRef.current;
       if (!section) return;
       const rect = section.getBoundingClientRect();
@@ -159,20 +165,21 @@ export function Hero() {
           Math.max(0, -rect.top / scrollableHeight)
         );
 
-        // 1. Pick and draw frame
+        // 1. Pick and draw frame (skips if same frame)
         const frameIndex = Math.min(
           FRAME_COUNT - 1,
           Math.floor(progress * FRAME_COUNT)
         );
         drawFrame(frameIndex);
 
-        // 2. Hero text fade (first 8%)
+        // 2. Hero text fade (first 8%) — direct DOM
         if (heroTextRef.current) {
           const opacity = Math.max(0, 1 - progress / 0.08);
           heroTextRef.current.style.opacity = String(opacity);
+          heroTextRef.current.style.transform = `translateY(${progress * 60}px) scale(${1 - progress * 0.15})`;
         }
 
-        // 3. Annotation card visibility
+        // 3. Annotation card visibility — only setState when changed
         const newVisible = new Set<string>();
         for (const card of annotations) {
           if (progress >= card.show && progress <= card.hide) {
@@ -210,27 +217,21 @@ export function Hero() {
           <motion.div
             className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--background)]"
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="mb-8">
               <motion.div
                 className="w-12 h-12 rounded-full border-2 border-zinc-200"
-                style={{
-                  borderTopColor: "#6366f1",
-                }}
+                style={{ borderTopColor: "#6366f1" }}
                 animate={{ rotate: 360 }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               />
             </div>
             <div className="w-64 h-1.5 rounded-full bg-zinc-200 overflow-hidden">
               <motion.div
                 className="h-full loading-bar rounded-full"
-                style={{ width: `${loadProgress * 100}%` }}
-                transition={{ duration: 0.1 }}
+                animate={{ width: `${loadProgress * 100}%` }}
+                transition={{ duration: 0.15, ease: "linear" }}
               />
             </div>
             <p className="mt-4 text-xs tracking-wider text-zinc-400 uppercase font-mono">
@@ -241,21 +242,18 @@ export function Hero() {
       </AnimatePresence>
 
       {/* Sticky viewport */}
-      <div
-        className="sticky top-0 h-screen"
-        style={{ willChange: "transform", transform: "translateZ(0)" }}
-      >
+      <div className="sticky top-0 h-screen gpu-layer">
         {/* Canvas */}
         <canvas
           ref={canvasRef}
-          className="h-full w-full"
-          style={{ willChange: "contents", transform: "translateZ(0)" }}
+          className="h-full w-full gpu-canvas"
         />
 
-        {/* Hero text overlay — fades in first 8% */}
+        {/* Hero text overlay */}
         <div
           ref={heroTextRef}
           className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-6"
+          style={{ willChange: "opacity, transform" }}
         >
           <motion.span
             className="inline-flex items-center gap-2 rounded-full border border-white/60 bg-white/40 px-3 py-1.5 text-[10px] font-medium tracking-wider text-zinc-500 uppercase shadow-sm backdrop-blur-md mb-6"
@@ -271,12 +269,7 @@ export function Hero() {
             className="text-4xl md:text-6xl lg:text-7xl font-semibold leading-[1.05] tracking-tighter text-zinc-950 max-w-[18ch]"
             initial={{ opacity: 0, y: 40 }}
             animate={loaded ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              delay: 0.5,
-              type: "spring",
-              stiffness: 80,
-              damping: 20,
-            }}
+            transition={{ delay: 0.5, type: "spring", stiffness: 80, damping: 20 }}
           >
             The future is built
             <br />
@@ -289,12 +282,7 @@ export function Hero() {
             className="mt-6 text-lg text-zinc-500 max-w-[48ch] leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={loaded ? { opacity: 1, y: 0 } : {}}
-            transition={{
-              delay: 0.7,
-              type: "spring",
-              stiffness: 80,
-              damping: 20,
-            }}
+            transition={{ delay: 0.7, type: "spring", stiffness: 80, damping: 20 }}
           >
             Cinematic frame-sequence animation, neumorphic design, and
             physics-based smooth scroll — all in one experience.
@@ -312,20 +300,12 @@ export function Hero() {
             </span>
             <motion.div
               animate={{ y: [0, 8, 0] }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
               className="h-6 w-4 rounded-full border-2 border-zinc-300 flex justify-center pt-1"
             >
               <motion.div
                 animate={{ y: [0, 8, 0] }}
-                transition={{
-                  duration: 1.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
                 className="h-1.5 w-1.5 rounded-full bg-zinc-400"
               />
             </motion.div>
@@ -338,15 +318,16 @@ export function Hero() {
           return (
             <div
               key={card.id}
-              className={`absolute top-1/2 -translate-y-1/2 transition-all duration-400 max-w-sm max-md:max-w-[280px] ${
+              className={`absolute top-1/2 transition-all duration-500 ease-out max-w-sm max-md:max-w-[280px] ${
                 card.position === "left"
                   ? "left-6 md:left-12 lg:left-20"
                   : "right-6 md:right-12 lg:right-20"
               } ${
                 isVisible
-                  ? "translate-y-[-50%] opacity-100"
-                  : "translate-y-[-40%] opacity-0 pointer-events-none"
+                  ? "-translate-y-1/2 opacity-100 scale-100"
+                  : "-translate-y-[40%] opacity-0 scale-95 pointer-events-none"
               }`}
+              style={{ willChange: "transform, opacity" }}
             >
               <div className="card-surface p-7 max-md:p-4">
                 <h3 className="text-lg font-semibold tracking-tight text-zinc-950 mb-2">
