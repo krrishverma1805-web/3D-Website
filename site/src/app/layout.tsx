@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Premium 3D Scroll Experience",
+  title: "STARK INDUSTRIES | Next-Gen Arc Reactor Technology",
   description:
-    "A cinematic scroll-driven hero with canvas frame-sequence animation, smooth physics-based scroll, and neumorphic design.",
+    "Experience the future of clean energy and advanced defense systems. Stark Industries — pioneering the arc reactor, autonomous defense, and next-generation AI since 1973.",
 };
 
 export default function RootLayout({
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans`}
       >

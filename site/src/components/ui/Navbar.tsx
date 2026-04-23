@@ -16,17 +16,17 @@ export function Navbar() {
   }, []);
 
   const navLinks = [
-    { label: "Home", href: "#" },
-    { label: "Work", href: "#work" },
-    { label: "About", href: "#about" },
-    { label: "Contact", href: "#contact" },
+    { label: "Arc Reactor", href: "#arc-reactor" },
+    { label: "Defense", href: "#defense" },
+    { label: "Technology", href: "#technology" },
+    { label: "Avengers Initiative", href: "#avengers" },
   ];
 
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled
-          ? "bg-white/40 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/30 shadow-sm"
+          ? "bg-black/60 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/5 shadow-lg shadow-black/20"
           : "bg-transparent"
       }`}
       initial={{ y: -100 }}
@@ -35,8 +35,14 @@ export function Navbar() {
     >
       <div className="mx-auto max-w-[1400px] px-6 md:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="font-semibold text-lg tracking-tight text-zinc-950">
-          Studio
+        <a href="#" className="flex items-center gap-2.5">
+          {/* Arc Reactor Icon */}
+          <div className="w-7 h-7 rounded-full border-2 border-sky-400/60 flex items-center justify-center arc-glow">
+            <div className="w-2.5 h-2.5 rounded-full bg-sky-400" />
+          </div>
+          <span className="font-semibold text-sm tracking-[0.2em] text-white uppercase">
+            Stark Industries
+          </span>
         </a>
 
         {/* Desktop links */}
@@ -45,16 +51,16 @@ export function Navbar() {
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-zinc-600 hover:text-zinc-950 transition-colors"
+              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
             >
               {link.label}
             </a>
           ))}
           <a
-            href="#contact"
-            className="px-5 py-2.5 rounded-2xl bg-zinc-950 text-white text-sm font-medium hover:bg-zinc-800 transition-colors"
+            href="#avengers"
+            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-amber-500 text-white text-sm font-medium hover:opacity-90 transition-opacity"
           >
-            Get in Touch
+            Join the Initiative
           </a>
         </div>
 
@@ -65,16 +71,16 @@ export function Navbar() {
           aria-label="Toggle menu"
         >
           <motion.span
-            className="h-[2px] w-full bg-zinc-950 rounded-full"
+            className="h-[2px] w-full bg-white rounded-full"
             animate={menuOpen ? { rotate: 45, y: 5.5 } : { rotate: 0, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
           <motion.span
-            className="h-[2px] w-full bg-zinc-950 rounded-full"
+            className="h-[2px] w-full bg-white rounded-full"
             animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
           />
           <motion.span
-            className="h-[2px] w-full bg-zinc-950 rounded-full"
+            className="h-[2px] w-full bg-white rounded-full"
             animate={
               menuOpen ? { rotate: -45, y: -5.5 } : { rotate: 0, y: 0 }
             }
@@ -87,7 +93,7 @@ export function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="md:hidden bg-white/80 backdrop-blur-2xl border-b border-white/30"
+            className="md:hidden bg-black/80 backdrop-blur-2xl border-b border-white/5"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -98,18 +104,18 @@ export function Navbar() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-base font-medium text-zinc-700 py-2"
+                  className="text-base font-medium text-zinc-300 py-2"
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.label}
                 </a>
               ))}
               <a
-                href="#contact"
-                className="px-5 py-3 rounded-2xl bg-zinc-950 text-white text-sm font-medium text-center mt-2"
+                href="#avengers"
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-amber-500 text-white text-sm font-medium text-center mt-2"
                 onClick={() => setMenuOpen(false)}
               >
-                Get in Touch
+                Join the Initiative
               </a>
             </div>
           </motion.div>

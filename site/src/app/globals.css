@@ -8,23 +8,32 @@
 }
 
 :root {
-  --background: #f5f5f5;
-  --foreground: #09090b;
-  --muted: #71717a;
-  --card-bg: #ffffff;
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --muted: #a1a1aa;
+  --card-bg: rgba(255, 255, 255, 0.04);
   --card-shadow:
-    0px 0.7px 0.7px -0.67px rgba(0, 0, 0, 0.08),
-    0px 1.8px 1.8px -1.33px rgba(0, 0, 0, 0.08),
-    0px 3.6px 3.6px -2px rgba(0, 0, 0, 0.07),
-    0px 6.9px 6.9px -2.67px rgba(0, 0, 0, 0.07),
-    0px 13.6px 13.6px -3.33px rgba(0, 0, 0, 0.05),
-    0px 30px 30px -4px rgba(0, 0, 0, 0.02),
-    inset 0px 3px 1px 0px rgba(255, 255, 255, 1);
+    0px 0.7px 0.7px -0.67px rgba(255, 255, 255, 0.04),
+    0px 1.8px 1.8px -1.33px rgba(255, 255, 255, 0.04),
+    0px 3.6px 3.6px -2px rgba(255, 255, 255, 0.03),
+    0px 6.9px 6.9px -2.67px rgba(255, 255, 255, 0.03),
+    0px 13.6px 13.6px -3.33px rgba(255, 255, 255, 0.02),
+    0px 30px 30px -4px rgba(255, 255, 255, 0.01),
+    inset 0px 1px 1px 0px rgba(255, 255, 255, 0.06);
+
+  /* Iron Man palette */
+  --stark-red: #dc2626;
+  --stark-red-light: #ef4444;
+  --stark-gold: #f59e0b;
+  --stark-gold-light: #fbbf24;
+  --arc-blue: #38bdf8;
+  --arc-cyan: #22d3ee;
 }
 
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: auto; /* let Lenis handle it */
 }
 
 body {
@@ -32,16 +41,25 @@ body {
   color: var(--foreground);
 }
 
-/* Card surfaces */
+/* Card surfaces — dark mode */
 .card-surface {
   background: var(--card-bg);
   border-radius: 20px;
   box-shadow: var(--card-shadow);
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.3s ease;
+}
+
+.card-surface:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .card-surface-nested {
-  background: var(--background);
+  background: rgba(255, 255, 255, 0.02);
   border-radius: 20px;
   box-shadow: var(--card-shadow);
 }
@@ -58,9 +76,32 @@ body {
   }
 }
 
-/* Loading bar gradient */
+/* Loading bar gradient — Arc Reactor */
 .loading-bar {
-  background: linear-gradient(to right, #6366f1, #8b5cf6);
+  background: linear-gradient(to right, var(--arc-blue), var(--arc-cyan));
+}
+
+/* Iron Man gradients */
+.gradient-stark {
+  background: linear-gradient(135deg, var(--stark-red), var(--stark-gold));
+}
+
+.gradient-arc {
+  background: linear-gradient(135deg, var(--arc-blue), var(--arc-cyan));
+}
+
+.text-gradient-stark {
+  background: linear-gradient(to right, var(--stark-red-light), var(--stark-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-arc {
+  background: linear-gradient(to right, var(--arc-blue), var(--arc-cyan));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 /* GPU acceleration layers */
@@ -79,31 +120,23 @@ body {
   image-rendering: -webkit-optimize-contrast;
 }
 
-/* Smooth scroll on iOS */
-html {
-  scroll-behavior: auto; /* let Lenis handle it */
-}
-
 /* Prevent layout shift during scroll */
 .scroll-animation {
   contain: layout style;
 }
 
-/* Optimized card transitions */
-.card-surface {
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 0.3s ease;
+/* Arc reactor glow pulse */
+@keyframes arc-pulse {
+  0%, 100% { box-shadow: 0 0 15px 2px rgba(56, 189, 248, 0.3); }
+  50% { box-shadow: 0 0 25px 6px rgba(56, 189, 248, 0.5); }
 }
 
-.card-surface:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0px 0.7px 0.7px -0.67px rgba(0, 0, 0, 0.1),
-    0px 1.8px 1.8px -1.33px rgba(0, 0, 0, 0.1),
-    0px 3.6px 3.6px -2px rgba(0, 0, 0, 0.09),
-    0px 6.9px 6.9px -2.67px rgba(0, 0, 0, 0.08),
-    0px 13.6px 13.6px -3.33px rgba(0, 0, 0, 0.06),
-    0px 30px 30px -4px rgba(0, 0, 0, 0.03),
-    inset 0px 3px 1px 0px rgba(255, 255, 255, 1);
+.arc-glow {
+  animation: arc-pulse 2s ease-in-out infinite;
 }
 
+/* Scanline overlay for tech feel */
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
