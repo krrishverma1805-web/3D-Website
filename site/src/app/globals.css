@@ -11,17 +11,8 @@
   --background: #050505;
   --foreground: #fafafa;
   --muted: #a1a1aa;
-  --card-bg: rgba(255, 255, 255, 0.03);
-  --card-shadow:
-    0px 0.7px 0.7px -0.67px rgba(255, 255, 255, 0.03),
-    0px 1.8px 1.8px -1.33px rgba(255, 255, 255, 0.03),
-    0px 3.6px 3.6px -2px rgba(255, 255, 255, 0.02),
-    0px 6.9px 6.9px -2.67px rgba(255, 255, 255, 0.02),
-    0px 13.6px 13.6px -3.33px rgba(255, 255, 255, 0.015),
-    0px 30px 30px -4px rgba(255, 255, 255, 0.008),
-    inset 0px 1px 0px 0px rgba(255, 255, 255, 0.04);
 
-  /* Refined Iron Man palette — luxurious gold tones */
+  /* Iron Man palette */
   --stark-red: #c62828;
   --stark-red-light: #ef5350;
   --stark-gold: #d4a017;
@@ -43,21 +34,13 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
 }
 
-/* ─── Premium Typography ─── */
+/* ─── Typography ─── */
 
-.text-gold {
-  color: var(--stark-gold-light);
-}
-
-.text-champagne {
-  color: var(--champagne);
-}
-
-.text-ivory {
-  color: var(--ivory);
-}
+.text-champagne { color: var(--champagne); }
+.text-ivory { color: var(--ivory); }
 
 .text-gradient-gold {
   background: linear-gradient(135deg, var(--stark-gold-light) 0%, var(--champagne) 50%, var(--stark-gold) 100%);
@@ -73,87 +56,48 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-.text-gradient-arc {
-  background: linear-gradient(to right, var(--arc-blue), var(--arc-cyan));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-/* Gold shimmer animation */
-@keyframes gold-shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
-
 .text-shimmer-gold {
-  background: linear-gradient(
-    90deg,
-    var(--stark-gold) 0%,
-    var(--champagne) 25%,
-    var(--stark-gold-light) 50%,
-    var(--champagne) 75%,
-    var(--stark-gold) 100%
-  );
-  background-size: 200% auto;
+  background: linear-gradient(135deg, var(--stark-gold) 0%, var(--champagne) 40%, var(--stark-gold-light) 60%, var(--champagne) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gold-shimmer 4s linear infinite;
 }
 
-/* ─── Card Surfaces — Dark Luxury ─── */
+/* ─── Cards — SOLID backgrounds, NO backdrop-blur ─── */
 
 .card-surface {
-  background: var(--card-bg);
+  background: rgba(12, 12, 12, 0.95);
   border-radius: 20px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(212, 160, 23, 0.08);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 160, 23, 0.06);
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.4s ease,
-    box-shadow 0.4s ease;
+    border-color 0.4s ease;
 }
 
 .card-surface:hover {
   transform: translateY(-3px);
-  border-color: rgba(212, 160, 23, 0.18);
-  box-shadow:
-    0 0 30px -8px rgba(212, 160, 23, 0.08),
-    var(--card-shadow);
+  border-color: rgba(212, 160, 23, 0.15);
 }
 
-.card-surface-nested {
-  background: rgba(255, 255, 255, 0.015);
-  border-radius: 20px;
-  box-shadow: var(--card-shadow);
-}
-
-/* ─── Scroll Animation ─── */
+/* ─── Scroll Sections ─── */
 
 @media (max-width: 1024px) {
-  .scroll-animation {
-    height: 350vh !important;
-  }
+  .scroll-animation { height: 350vh !important; }
 }
 @media (max-width: 768px) {
-  .scroll-animation {
-    height: 300vh !important;
-  }
+  .scroll-animation { height: 300vh !important; }
 }
 
 .scroll-animation {
   contain: layout style;
 }
 
-/* ─── Loading ─── */
+/* ─── Loading Bar ─── */
 
 .loading-bar {
   background: linear-gradient(to right, var(--stark-gold), var(--champagne));
 }
 
-/* ─── Iron Man Accent Lines ─── */
+/* ─── Accent Lines ─── */
 
 .accent-line-gold {
   height: 1px;
@@ -167,21 +111,16 @@ body {
   opacity: 0.25;
 }
 
-/* ─── GPU Acceleration ─── */
+/* ─── GPU Layers ─── */
 
 .gpu-layer {
   will-change: transform;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
 }
 
 .gpu-canvas {
-  will-change: contents;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
-  image-rendering: -webkit-optimize-contrast;
+  transform: translate3d(0, 0, 0);
 }
 
 /* ─── Arc Reactor Glow ─── */
@@ -195,65 +134,24 @@ body {
   animation: arc-pulse 2.5s ease-in-out infinite;
 }
 
-/* ─── Premium Entrance Transitions ─── */
+/* ─── Scrollbar ─── */
 
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(212, 160, 23, 0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(212, 160, 23, 0.4); }
+* { scrollbar-width: thin; scrollbar-color: rgba(212, 160, 23, 0.2) transparent; }
+
+/* ─── Annotation/Overlay Cards — SOLID, no blur ─── */
+
+.glass-card-dark {
+  background: rgba(8, 8, 8, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
 }
 
-@keyframes fade-up-slow {
-  from {
-    opacity: 0;
-    transform: translateY(50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ─── Subtle Noise Texture ─── */
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0.015;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
-}
-
-/* ─── Scrollbar Styling ─── */
-
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(212, 160, 23, 0.2);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 160, 23, 0.4);
-}
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 160, 23, 0.2) transparent;
+.glass-card-overlay {
+  background: rgba(5, 5, 5, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
 }

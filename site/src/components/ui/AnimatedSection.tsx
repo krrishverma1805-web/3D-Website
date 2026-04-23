@@ -6,21 +6,19 @@ import { ReactNode } from "react";
 const containerVariants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.15 },
+    transition: { staggerChildren: 0.12 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 40, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    filter: "blur(0px)",
     transition: {
       type: "spring",
-      stiffness: 60,
-      damping: 20,
-      mass: 1,
+      stiffness: 70,
+      damping: 22,
     },
   },
 };

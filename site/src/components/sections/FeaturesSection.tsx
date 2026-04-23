@@ -47,7 +47,7 @@ export function FeaturesSection() {
       <div className="mx-auto max-w-[1200px]">
         <AnimatedSection className="text-center mb-20">
           <AnimatedItem>
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/10 bg-amber-500/5 px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-amber-300/60 uppercase backdrop-blur-md">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/10 bg-[#0c0c0c] px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-amber-300/60 uppercase">
               <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
               Stark Tech Arsenal
             </span>

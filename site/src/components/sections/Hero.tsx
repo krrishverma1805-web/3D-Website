@@ -232,7 +232,7 @@ export function Hero() {
             animate={loaded ? { opacity: 1, y: 0 } : {}}
             transition={{ delay: 0.6, duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/15 bg-amber-500/5 px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-amber-300/70 uppercase backdrop-blur-md">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/15 bg-[#0c0c0c] px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-amber-300/70 uppercase">
               <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
               Classified — Level 10
             </span>
@@ -301,7 +301,7 @@ export function Hero() {
                 willChange: "transform, opacity",
               }}
             >
-              <div className="bg-black/50 backdrop-blur-2xl border border-white/[0.06] rounded-2xl p-6 max-md:p-4">
+              <div className="glass-card-dark p-6 max-md:p-4">
                 {/* Stat */}
                 <div className="flex items-end gap-2 mb-4">
                   <span className="text-3xl font-bold text-gradient-gold leading-none tracking-tight">

@@ -188,7 +188,7 @@ export function ProjectsShowcase() {
 
           {/* Intro */}
           <div ref={introOverlayRef} className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none px-6" style={{ willChange: "opacity, transform" }}>
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-red-500/10 bg-red-500/5 px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-red-300/60 uppercase backdrop-blur-md mb-8">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-red-500/10 bg-[#0c0c0c] px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-red-300/60 uppercase mb-8">
               <span className="w-1 h-1 rounded-full bg-red-500 animate-pulse" />
               Suit Archive — Classified
             </span>
@@ -221,7 +221,7 @@ export function ProjectsShowcase() {
                   willChange: "transform, opacity",
                 }}
               >
-                <div className="bg-black/50 backdrop-blur-2xl border border-white/[0.05] rounded-2xl p-6 max-md:p-4">
+                <div className="glass-card-dark p-6 max-md:p-4">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-[9px] tracking-[0.35em] text-amber-300/50 uppercase font-mono">
                       {suit.year}
@@ -247,7 +247,7 @@ export function ProjectsShowcase() {
             className={`absolute inset-0 flex items-center justify-center ${ctaVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
             style={{ transition: "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)", willChange: "opacity" }}
           >
-            <div className="bg-black/60 backdrop-blur-2xl rounded-2xl border border-white/[0.05] p-12 max-w-md text-center max-md:mx-6 max-md:p-8">
+            <div className="glass-card-overlay p-12 max-w-md text-center max-md:mx-6 max-md:p-8">
               <p className="text-[9px] tracking-[0.4em] text-zinc-600 uppercase font-mono mb-6">
                 Tony Stark — 1970–2023
               </p>

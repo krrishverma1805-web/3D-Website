@@ -19,7 +19,7 @@ export function FinalCTA() {
       <div className="mx-auto max-w-[900px] relative">
         <AnimatedSection className="text-center">
           <AnimatedItem>
-            <span className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/10 bg-amber-500/5 px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-amber-300/50 uppercase backdrop-blur-md">
+            <span className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/10 bg-[#0c0c0c] px-5 py-2 text-[9px] font-medium tracking-[0.4em] text-amber-300/50 uppercase">
               <span className="w-1 h-1 rounded-full bg-amber-400 animate-pulse" />
               Avengers Initiative
             </span>
