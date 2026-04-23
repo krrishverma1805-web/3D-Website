@@ -15,7 +15,7 @@ export function Hero() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const heroTextRef = useRef<HTMLDivElement>(null);
-  const framesRef = useRef<HTMLImageElement[]>([]);
+  const bitmapsRef = useRef<ImageBitmap[]>([]);
   const tickingRef = useRef(false);
   const lastFrameRef = useRef(-1);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -25,20 +25,26 @@ export function Hero() {
   const [loaded, setLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
 
+  // Preload frames as ImageBitmaps (GPU-decoded, zero jank on draw)
   useEffect(() => {
     let count = 0;
-    const imgs: HTMLImageElement[] = [];
-    for (let i = 1; i <= FRAME_COUNT; i++) {
+    const bitmaps: (ImageBitmap | null)[] = new Array(FRAME_COUNT).fill(null);
+
+    for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
-      img.src = `/frames/frame_${String(i).padStart(4, "0")}.jpg`;
+      img.src = `/frames/frame_${String(i + 1).padStart(4, "0")}.jpg`;
       img.onload = () => {
-        count++;
-        if (count % 17 === 0 || count === FRAME_COUNT) setLoadProgress(count / FRAME_COUNT);
-        if (count === FRAME_COUNT) setLoaded(true);
+        createImageBitmap(img).then((bmp) => {
+          bitmaps[i] = bmp;
+          count++;
+          if (count % 20 === 0 || count === FRAME_COUNT) setLoadProgress(count / FRAME_COUNT);
+          if (count === FRAME_COUNT) {
+            bitmapsRef.current = bitmaps as ImageBitmap[];
+            setLoaded(true);
+          }
+        });
       };
-      imgs.push(img);
     }
-    framesRef.current = imgs;
   }, []);
 
   const drawFrame = useCallback((index: number) => {
@@ -46,26 +52,25 @@ export function Hero() {
     lastFrameRef.current = index;
     const canvas = canvasRef.current;
     const ctx = ctxRef.current;
-    const img = framesRef.current[index];
-    if (!canvas || !ctx || !img || !img.complete) return;
+    const bmp = bitmapsRef.current[index];
+    if (!canvas || !ctx || !bmp) return;
     const cw = canvas.width, ch = canvas.height;
-    const ir = img.naturalWidth / img.naturalHeight;
+    const ir = bmp.width / bmp.height;
     const cr = cw / ch;
     let dw: number, dh: number;
     if (cr > ir) { dw = cw; dh = cw / ir; } else { dh = ch; dw = ch * ir; }
-    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    ctx.drawImage(bmp, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
   }, []);
 
   const resizeCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    // DPR capped at 1 — no retina scaling for video frames
+    // 1:1 with viewport — source frames are already 1920x1080
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
-    ctxRef.current = canvas.getContext("2d", { alpha: false });
-    if (ctxRef.current) ctxRef.current.imageSmoothingEnabled = true;
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    ctxRef.current = canvas.getContext("2d", { alpha: false, desynchronized: true });
     lastFrameRef.current = -1;
   }, []);
 
@@ -95,14 +100,12 @@ export function Hero() {
 
         drawFrame(Math.min(FRAME_COUNT - 1, Math.floor(p * FRAME_COUNT)));
 
-        // Hero text — direct DOM only
         if (heroTextRef.current) {
           const o = Math.max(0, 1 - p / 0.08);
           heroTextRef.current.style.opacity = String(o);
           heroTextRef.current.style.transform = `translateY(${p * 80}px)`;
         }
 
-        // Cards — direct DOM only, no setState
         for (let i = 0; i < annotations.length; i++) {
           const card = annotations[i];
           const el = cardElsRef.current[i];
@@ -115,7 +118,6 @@ export function Hero() {
             el.style.pointerEvents = vis ? "auto" : "none";
           }
         }
-
         tickingRef.current = false;
       });
     };

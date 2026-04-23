@@ -17,7 +17,7 @@ export function ProjectsShowcase() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const introRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const framesRef = useRef<HTMLImageElement[]>([]);
+  const bitmapsRef = useRef<ImageBitmap[]>([]);
   const tickingRef = useRef(false);
   const lastFrameRef = useRef(-1);
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -31,18 +31,23 @@ export function ProjectsShowcase() {
 
   useEffect(() => {
     let count = 0;
-    const imgs: HTMLImageElement[] = [];
-    for (let i = 1; i <= FRAME_COUNT; i++) {
+    const bitmaps: (ImageBitmap | null)[] = new Array(FRAME_COUNT).fill(null);
+
+    for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
-      img.src = `/tunnel-frames/frame_${String(i).padStart(4, "0")}.jpg`;
+      img.src = `/tunnel-frames/frame_${String(i + 1).padStart(4, "0")}.jpg`;
       img.onload = () => {
-        count++;
-        if (count % 17 === 0 || count === FRAME_COUNT) setLoadProgress(count / FRAME_COUNT);
-        if (count === FRAME_COUNT) setLoaded(true);
+        createImageBitmap(img).then((bmp) => {
+          bitmaps[i] = bmp;
+          count++;
+          if (count % 20 === 0 || count === FRAME_COUNT) setLoadProgress(count / FRAME_COUNT);
+          if (count === FRAME_COUNT) {
+            bitmapsRef.current = bitmaps as ImageBitmap[];
+            setLoaded(true);
+          }
+        });
       };
-      imgs.push(img);
     }
-    framesRef.current = imgs;
   }, []);
 
   const drawFrame = useCallback((index: number) => {
@@ -50,14 +55,14 @@ export function ProjectsShowcase() {
     lastFrameRef.current = index;
     const canvas = canvasRef.current;
     const ctx = ctxRef.current;
-    const img = framesRef.current[index];
-    if (!canvas || !ctx || !img || !img.complete) return;
+    const bmp = bitmapsRef.current[index];
+    if (!canvas || !ctx || !bmp) return;
     const cw = canvas.width, ch = canvas.height;
-    const ir = img.naturalWidth / img.naturalHeight;
+    const ir = bmp.width / bmp.height;
     const cr = cw / ch;
     let dw: number, dh: number;
     if (cr > ir) { dw = cw; dh = cw / ir; } else { dh = ch; dw = ch * ir; }
-    ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+    ctx.drawImage(bmp, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
   }, []);
 
   const resizeCanvas = useCallback(() => {
@@ -65,10 +70,9 @@ export function ProjectsShowcase() {
     if (!canvas) return;
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    canvas.style.width = window.innerWidth + "px";
-    canvas.style.height = window.innerHeight + "px";
-    ctxRef.current = canvas.getContext("2d", { alpha: false });
-    if (ctxRef.current) ctxRef.current.imageSmoothingEnabled = true;
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    ctxRef.current = canvas.getContext("2d", { alpha: false, desynchronized: true });
     lastFrameRef.current = -1;
   }, []);
 
@@ -98,7 +102,6 @@ export function ProjectsShowcase() {
 
         drawFrame(Math.min(FRAME_COUNT - 1, Math.floor(p * FRAME_COUNT)));
 
-        // Intro — direct DOM
         if (introRef.current) {
           const op = Math.max(0, 1 - p / 0.06);
           if (Math.abs(op - introOpRef.current) > 0.01) {
@@ -108,7 +111,6 @@ export function ProjectsShowcase() {
           }
         }
 
-        // Cards — direct DOM, no setState
         for (let i = 0; i < suits.length; i++) {
           const suit = suits[i];
           const el = cardElsRef.current[i];
@@ -122,7 +124,6 @@ export function ProjectsShowcase() {
           }
         }
 
-        // CTA — direct DOM
         if (ctaRef.current) {
           const show = p >= 0.82;
           if (show !== ctaStateRef.current) {
