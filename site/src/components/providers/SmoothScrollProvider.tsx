@@ -11,10 +11,10 @@ export function SmoothScrollProvider({
     <ReactLenis
       root
       options={{
-        lerp: 0.07,
-        duration: 1.4,
+        lerp: 0.05,
+        duration: 1.6,
         smoothWheel: true,
-        wheelMultiplier: 0.8,
+        wheelMultiplier: 0.7,
         touchMultiplier: 1.5,
         syncTouch: false,
         autoResize: true,

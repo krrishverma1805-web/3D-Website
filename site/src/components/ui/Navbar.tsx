@@ -19,48 +19,47 @@ export function Navbar() {
     { label: "Arc Reactor", href: "#arc-reactor" },
     { label: "Defense", href: "#defense" },
     { label: "Technology", href: "#technology" },
-    { label: "Avengers Initiative", href: "#avengers" },
+    { label: "Avengers", href: "#avengers" },
   ];
 
   return (
     <motion.nav
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
         scrolled
-          ? "bg-black/60 backdrop-blur-2xl backdrop-saturate-150 border-b border-white/5 shadow-lg shadow-black/20"
+          ? "bg-black/50 backdrop-blur-3xl border-b border-white/[0.04]"
           : "bg-transparent"
       }`}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 200, damping: 30 }}
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 100, damping: 25, delay: 0.2 }}
     >
-      <div className="mx-auto max-w-[1400px] px-6 md:px-8 h-16 flex items-center justify-between">
+      <div className="mx-auto max-w-[1400px] px-6 md:px-8 h-18 flex items-center justify-between">
         {/* Logo */}
-        <a href="#" className="flex items-center gap-2.5">
-          {/* Arc Reactor Icon */}
-          <div className="w-7 h-7 rounded-full border-2 border-sky-400/60 flex items-center justify-center arc-glow">
-            <div className="w-2.5 h-2.5 rounded-full bg-sky-400" />
+        <a href="#" className="flex items-center gap-3 group">
+          <div className="w-7 h-7 rounded-full border border-sky-400/40 flex items-center justify-center arc-glow transition-all duration-300 group-hover:border-sky-400/60">
+            <div className="w-2 h-2 rounded-full bg-sky-400" />
           </div>
-          <span className="font-semibold text-sm tracking-[0.2em] text-white uppercase">
+          <span className="font-medium text-xs tracking-[0.35em] text-champagne uppercase">
             Stark Industries
           </span>
         </a>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-10">
           {navLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
-              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+              className="text-xs tracking-[0.15em] font-medium text-zinc-500 hover:text-champagne transition-colors duration-300 uppercase"
             >
               {link.label}
             </a>
           ))}
           <a
             href="#avengers"
-            className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-amber-500 text-white text-sm font-medium hover:opacity-90 transition-opacity"
+            className="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-600/80 to-yellow-500/80 text-xs tracking-[0.1em] font-semibold text-black uppercase hover:from-amber-500/90 hover:to-yellow-400/90 transition-all duration-300"
           >
-            Join the Initiative
+            Initiative
           </a>
         </div>
 
@@ -71,18 +70,18 @@ export function Navbar() {
           aria-label="Toggle menu"
         >
           <motion.span
-            className="h-[2px] w-full bg-white rounded-full"
-            animate={menuOpen ? { rotate: 45, y: 5.5 } : { rotate: 0, y: 0 }}
+            className="h-[1.5px] w-full bg-champagne rounded-full"
+            animate={menuOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
           <motion.span
-            className="h-[2px] w-full bg-white rounded-full"
+            className="h-[1.5px] w-full bg-champagne rounded-full"
             animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
           />
           <motion.span
-            className="h-[2px] w-full bg-white rounded-full"
+            className="h-[1.5px] w-full bg-champagne rounded-full"
             animate={
-              menuOpen ? { rotate: -45, y: -5.5 } : { rotate: 0, y: 0 }
+              menuOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }
             }
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           />
@@ -93,18 +92,18 @@ export function Navbar() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="md:hidden bg-black/80 backdrop-blur-2xl border-b border-white/5"
+            className="md:hidden bg-black/80 backdrop-blur-3xl border-b border-white/[0.04]"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
           >
-            <div className="px-6 py-4 flex flex-col gap-3">
+            <div className="px-6 py-6 flex flex-col gap-4">
               {navLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-base font-medium text-zinc-300 py-2"
+                  className="text-sm tracking-[0.1em] font-medium text-zinc-400 py-2 uppercase"
                   onClick={() => setMenuOpen(false)}
                 >
                   {link.label}
@@ -112,10 +111,10 @@ export function Navbar() {
               ))}
               <a
                 href="#avengers"
-                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-red-600 to-amber-500 text-white text-sm font-medium text-center mt-2"
+                className="px-5 py-3 rounded-full bg-gradient-to-r from-amber-600/80 to-yellow-500/80 text-xs tracking-[0.1em] font-semibold text-black text-center mt-2 uppercase"
                 onClick={() => setMenuOpen(false)}
               >
-                Join the Initiative
+                Join Initiative
               </a>
             </div>
           </motion.div>

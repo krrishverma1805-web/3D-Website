@@ -8,32 +8,36 @@
 }
 
 :root {
-  --background: #0a0a0a;
+  --background: #050505;
   --foreground: #fafafa;
   --muted: #a1a1aa;
-  --card-bg: rgba(255, 255, 255, 0.04);
+  --card-bg: rgba(255, 255, 255, 0.03);
   --card-shadow:
-    0px 0.7px 0.7px -0.67px rgba(255, 255, 255, 0.04),
-    0px 1.8px 1.8px -1.33px rgba(255, 255, 255, 0.04),
-    0px 3.6px 3.6px -2px rgba(255, 255, 255, 0.03),
-    0px 6.9px 6.9px -2.67px rgba(255, 255, 255, 0.03),
-    0px 13.6px 13.6px -3.33px rgba(255, 255, 255, 0.02),
-    0px 30px 30px -4px rgba(255, 255, 255, 0.01),
-    inset 0px 1px 1px 0px rgba(255, 255, 255, 0.06);
+    0px 0.7px 0.7px -0.67px rgba(255, 255, 255, 0.03),
+    0px 1.8px 1.8px -1.33px rgba(255, 255, 255, 0.03),
+    0px 3.6px 3.6px -2px rgba(255, 255, 255, 0.02),
+    0px 6.9px 6.9px -2.67px rgba(255, 255, 255, 0.02),
+    0px 13.6px 13.6px -3.33px rgba(255, 255, 255, 0.015),
+    0px 30px 30px -4px rgba(255, 255, 255, 0.008),
+    inset 0px 1px 0px 0px rgba(255, 255, 255, 0.04);
 
-  /* Iron Man palette */
-  --stark-red: #dc2626;
-  --stark-red-light: #ef4444;
-  --stark-gold: #f59e0b;
-  --stark-gold-light: #fbbf24;
+  /* Refined Iron Man palette — luxurious gold tones */
+  --stark-red: #c62828;
+  --stark-red-light: #ef5350;
+  --stark-gold: #d4a017;
+  --stark-gold-light: #f5c842;
+  --stark-gold-pale: #e8d5a3;
   --arc-blue: #38bdf8;
   --arc-cyan: #22d3ee;
+  --champagne: #f5e6c8;
+  --ivory: #faf7f0;
 }
 
 html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  scroll-behavior: auto; /* let Lenis handle it */
+  scroll-behavior: auto;
+  text-rendering: optimizeLegibility;
 }
 
 body {
@@ -41,57 +45,29 @@ body {
   color: var(--foreground);
 }
 
-/* Card surfaces — dark mode */
-.card-surface {
-  background: var(--card-bg);
-  border-radius: 20px;
-  box-shadow: var(--card-shadow);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    border-color 0.3s ease;
+/* ─── Premium Typography ─── */
+
+.text-gold {
+  color: var(--stark-gold-light);
 }
 
-.card-surface:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.12);
+.text-champagne {
+  color: var(--champagne);
 }
 
-.card-surface-nested {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 20px;
-  box-shadow: var(--card-shadow);
+.text-ivory {
+  color: var(--ivory);
 }
 
-/* Scroll animation responsive heights */
-@media (max-width: 1024px) {
-  .scroll-animation {
-    height: 350vh !important;
-  }
-}
-@media (max-width: 768px) {
-  .scroll-animation {
-    height: 300vh !important;
-  }
-}
-
-/* Loading bar gradient — Arc Reactor */
-.loading-bar {
-  background: linear-gradient(to right, var(--arc-blue), var(--arc-cyan));
-}
-
-/* Iron Man gradients */
-.gradient-stark {
-  background: linear-gradient(135deg, var(--stark-red), var(--stark-gold));
-}
-
-.gradient-arc {
-  background: linear-gradient(135deg, var(--arc-blue), var(--arc-cyan));
+.text-gradient-gold {
+  background: linear-gradient(135deg, var(--stark-gold-light) 0%, var(--champagne) 50%, var(--stark-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-stark {
-  background: linear-gradient(to right, var(--stark-red-light), var(--stark-gold));
+  background: linear-gradient(135deg, var(--stark-red-light) 0%, var(--stark-gold-light) 50%, var(--champagne) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -104,7 +80,95 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-/* GPU acceleration layers */
+/* Gold shimmer animation */
+@keyframes gold-shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.text-shimmer-gold {
+  background: linear-gradient(
+    90deg,
+    var(--stark-gold) 0%,
+    var(--champagne) 25%,
+    var(--stark-gold-light) 50%,
+    var(--champagne) 75%,
+    var(--stark-gold) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-shimmer 4s linear infinite;
+}
+
+/* ─── Card Surfaces — Dark Luxury ─── */
+
+.card-surface {
+  background: var(--card-bg);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(212, 160, 23, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.card-surface:hover {
+  transform: translateY(-3px);
+  border-color: rgba(212, 160, 23, 0.18);
+  box-shadow:
+    0 0 30px -8px rgba(212, 160, 23, 0.08),
+    var(--card-shadow);
+}
+
+.card-surface-nested {
+  background: rgba(255, 255, 255, 0.015);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+}
+
+/* ─── Scroll Animation ─── */
+
+@media (max-width: 1024px) {
+  .scroll-animation {
+    height: 350vh !important;
+  }
+}
+@media (max-width: 768px) {
+  .scroll-animation {
+    height: 300vh !important;
+  }
+}
+
+.scroll-animation {
+  contain: layout style;
+}
+
+/* ─── Loading ─── */
+
+.loading-bar {
+  background: linear-gradient(to right, var(--stark-gold), var(--champagne));
+}
+
+/* ─── Iron Man Accent Lines ─── */
+
+.accent-line-gold {
+  height: 1px;
+  background: linear-gradient(to right, var(--stark-gold), transparent);
+  opacity: 0.3;
+}
+
+.accent-line-red-gold {
+  height: 1px;
+  background: linear-gradient(to right, var(--stark-red), var(--stark-gold), transparent);
+  opacity: 0.25;
+}
+
+/* ─── GPU Acceleration ─── */
+
 .gpu-layer {
   will-change: transform;
   transform: translateZ(0);
@@ -120,23 +184,76 @@ body {
   image-rendering: -webkit-optimize-contrast;
 }
 
-/* Prevent layout shift during scroll */
-.scroll-animation {
-  contain: layout style;
-}
+/* ─── Arc Reactor Glow ─── */
 
-/* Arc reactor glow pulse */
 @keyframes arc-pulse {
-  0%, 100% { box-shadow: 0 0 15px 2px rgba(56, 189, 248, 0.3); }
-  50% { box-shadow: 0 0 25px 6px rgba(56, 189, 248, 0.5); }
+  0%, 100% { box-shadow: 0 0 12px 2px rgba(56, 189, 248, 0.25); }
+  50% { box-shadow: 0 0 20px 5px rgba(56, 189, 248, 0.45); }
 }
 
 .arc-glow {
-  animation: arc-pulse 2s ease-in-out infinite;
+  animation: arc-pulse 2.5s ease-in-out infinite;
 }
 
-/* Scanline overlay for tech feel */
-@keyframes scanline {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
+/* ─── Premium Entrance Transitions ─── */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-up-slow {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Subtle Noise Texture ─── */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ─── Scrollbar Styling ─── */
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(212, 160, 23, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 160, 23, 0.4);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 160, 23, 0.2) transparent;
 }

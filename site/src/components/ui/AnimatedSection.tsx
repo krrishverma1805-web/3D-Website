@@ -6,16 +6,22 @@ import { ReactNode } from "react";
 const containerVariants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.1 },
+    transition: { staggerChildren: 0.15 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 40, filter: "blur(6px)" },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { type: "spring", stiffness: 100, damping: 20 },
+    filter: "blur(0px)",
+    transition: {
+      type: "spring",
+      stiffness: 60,
+      damping: 20,
+      mass: 1,
+    },
   },
 };
 
@@ -33,7 +39,7 @@ export function AnimatedSection({
       variants={containerVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
+      viewport={{ once: true, margin: "-80px" }}
       transition={{ delayChildren: delay }}
       className={className}
     >
